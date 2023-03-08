@@ -1,11 +1,15 @@
 package com.youkeda.application.ebusiness.control;
 
+import com.youkeda.application.ebusiness.dao.UserDAO;
+import com.youkeda.application.ebusiness.dataobject.UserDO;
 import com.youkeda.application.ebusiness.model.*;
+import com.youkeda.application.ebusiness.param.BasePageParam;
 import com.youkeda.application.ebusiness.service.CategoryService;
 import com.youkeda.application.ebusiness.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
@@ -26,6 +30,9 @@ public class ProductTestControl {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private UserDAO userDAO;
+
     @GetMapping(path = "/product/save")
     @ResponseBody
     public Map save () {
@@ -33,11 +40,11 @@ public class ProductTestControl {
 
         List<Product> products = new ArrayList<>();
 
-        for (int i = 0; i < 11; i++) {
+        for (int i = 20; i < 31; i++) {
             Product product = new Product();
-            User user = new User();
-            user.setId(1L);
-            user.setName("吴彦祖");
+
+            UserDO userDO = userDAO.findByUserId(1);
+            User user = userDO.toModel();
             product.setUser(user);
 
             product.setName("测试商品" + i);
@@ -66,6 +73,21 @@ public class ProductTestControl {
             products.add(product1);
         }
         result.put("products", products);
+        return result;
+    }
+
+    @GetMapping(path = "/test/category/pageQuery")
+    @ResponseBody
+    public Map pageQuery (@RequestParam("pageNum") int pageNum, @RequestParam("pageSize") int pageSize) {
+        Map result = new HashMap();
+
+        BasePageParam basePageParam = new BasePageParam();
+        basePageParam.setPagination(pageNum - 1);
+        basePageParam.setPageSize(pageSize);
+        Paging<Product> paging = productService.pageQueryProduct(basePageParam);
+        result.put("paging", paging);
+
+
         return result;
     }
 }

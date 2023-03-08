@@ -62,7 +62,7 @@ public interface UserDAO {
      * @param id
      * @return
      */
-    UserDO findById(@Param("id") long id);
+    UserDO findByUserId(@Param("id") long id);
 }
 
 

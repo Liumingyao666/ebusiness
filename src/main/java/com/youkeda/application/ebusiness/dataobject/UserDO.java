@@ -4,13 +4,14 @@ import com.youkeda.application.ebusiness.model.Gender;
 import com.youkeda.application.ebusiness.model.User;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * @author 刘铭垚
  * @version 1.0
  */
-public class UserDO {
+public class UserDO implements Serializable {
     private long id;
 
     private LocalDateTime gmtCreated;
@@ -37,18 +38,14 @@ public class UserDO {
      */
     public User toModel(){
         User user = new User();
-        user.setId(this.id);
-        user.setGmtCreated(this.gmtCreated);
-        user.setGmtModified(this.gmtModified);
-        user.setUserName(this.userName);
-        user.setPwd(this.password);
-        user.setMobile(this.mobile);
-        user.setEmail(this.email);
-        user.setAvatarUrl(this.avatarUrl);
-        user.setName(this.name);
-        if (StringUtils.isNotBlank(this.gender)) {
-            user.setGender(Gender.valueOf(this.gender));
-        }
+        user.setId(getId());
+        user.setUserName(getUserName());
+        user.setPwd(getPassword());
+        user.setMobile(getMobile());
+        user.setEmail(getEmail());
+        user.setAvatarUrl(getAvatarUrl());
+        user.setName(getName());
+        user.setGender(Gender.valueOf(getGender()));
         return user;
     }
 

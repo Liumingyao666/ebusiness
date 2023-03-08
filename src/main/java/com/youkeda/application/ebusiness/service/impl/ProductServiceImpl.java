@@ -13,6 +13,8 @@ import com.youkeda.application.ebusiness.param.BasePageParam;
 import com.youkeda.application.ebusiness.service.CategoryService;
 import com.youkeda.application.ebusiness.service.ProductService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -27,6 +29,8 @@ import java.util.List;
  */
 @Service
 public class ProductServiceImpl implements ProductService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Autowired
     private ProductDAO productDAO;
@@ -62,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> resultData = new ArrayList<>();
         if (!CollectionUtils.isEmpty(productDOS)) {
             for (ProductDO productDO : productDOS) {
-                Product product = toModel(productDO);
+                Product product = productToModel(productDO);
                 resultData.add(product);
             }
         }
@@ -79,12 +83,12 @@ public class ProductServiceImpl implements ProductService {
      * DO转model
      * @return
      */
-    private Product toModel (ProductDO productDO) {
+    private Product productToModel (ProductDO productDO) {
         Product product = new Product();
         product.setId(productDO.getId());
 //        处理用户
         if (productDO.getUserId() > 0) {
-            UserDO userDO = userDAO.findById(productDO.getId());
+            UserDO userDO = userDAO.findByUserId(productDO.getUserId());
             User user = userDO.toModel();
             product.setUser(user);
         }

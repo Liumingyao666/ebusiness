@@ -46,7 +46,7 @@ public class ProductDO {
     }
 
     public ProductDO(Product product){
-        this.id = product.getId();
+//        this.id = product.getId();
         if (product.getUser() != null) {
             this.userId = product.getUser().getId();
         }

@@ -9,6 +9,7 @@ import com.youkeda.application.ebusiness.service.UserService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -20,8 +21,11 @@ import javax.annotation.Resource;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Resource
+    @Autowired
     private UserDAO userDAO;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public Result<User> register(User user) {
@@ -45,8 +49,13 @@ public class UserServiceImpl implements UserService {
             return result;
         }
 
+        UserDO userDO = (UserDO)redisTemplate.opsForValue().get(user.getUserName());
+
+        if (userDO == null) {
+            userDO = userDAO.findByUserName(user.getUserName());
+        }
+
         //用户名不能重复
-        UserDO userDO = userDAO.findByUserName(user.getUserName());
         if (userDO != null) {
             result.setCode("602");
             result.setMessage("用户名已存在");
@@ -72,6 +81,8 @@ public class UserServiceImpl implements UserService {
         User user1 = userDO1.toModel();
         result.setData(user1);
 
+        //新用户注册成功后，存入缓存
+        redisTemplate.opsForValue().set(user.getUserName(),userDO1);
         return result;
     }
 
@@ -92,8 +103,14 @@ public class UserServiceImpl implements UserService {
             return result;
         }
 
+        UserDO userDO = (UserDO) redisTemplate.opsForValue().get(userName);
+
+        //判断缓存中找到的数据是否为空，为空去数据库中找
+        if (userDO == null) {
+            userDO = userDAO.findByUserName(userName);
+        }
+
         //用户名不存在
-        UserDO userDO = userDAO.findByUserName(userName);
         if (userDO == null) {
             result.setCode("602");
             result.setMessage("用户名不存在");

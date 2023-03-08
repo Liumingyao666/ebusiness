@@ -69,7 +69,7 @@
         select * from user where user_name = #{userName} limit 1
     </select>
 
-    <select id="findById" resultMap="userResultMap">
+    <select id="findByUserId" resultMap="userResultMap">
         select * from user where id = #{id}
     </select>
 </mapper>
